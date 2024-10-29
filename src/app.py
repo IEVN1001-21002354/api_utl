@@ -23,7 +23,23 @@ def lista_alumnos():
         return jsonify({'alumnos':alumnos,'mensaje':'Lista de alumnos', 'exito':True})
     except Exception as ex:
         return jsonify({"message": "error {}".format(ex),'exito':False}),500
+    
+""" ----------------------------------------------------------------------------------------------------------------------------------- """
 
+@app.route("/alumnos/<mat>",methods=['GET'])
+def leer_alumnos(mat):
+    try:
+        alumno=leer_alumnos_bd(mat)
+        if alumno!= None:
+            return jsonify({'alumnos':alumno,'mensaje':'Alumno encontrado', 'exito':True})
+        else:
+            return jsonify({'alumnos':alumno,'mensaje':'Lista de alumnos', 'exito':False})
+
+    except Exception as ex:
+        return jsonify({"message": "error {}".format(ex),'exito':False}),500
+
+
+""" ----------------------------------------------------------------------------------------------------------------------------------- """
 
 def pagina_no_encontrada(error):
     return"<h1>Pagina no encontrada</h1>"    
