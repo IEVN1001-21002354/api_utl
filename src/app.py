@@ -23,13 +23,50 @@ def lista_alumnos():
         return jsonify({'alumnos':alumnos,'mensaje':'Lista de alumnos', 'exito':True})
     except Exception as ex:
         return jsonify({"message": "error {}".format(ex),'exito':False}),500
-    
+
+def leer_alumno_bd(matricula):
+    try:
+        cursor=con.connection.cursor()
+        sql="select * from  where matricula={}".format(matricula)
+        
+        cursor.execute(sql)
+        datos=cursor.fechone()
+        
+        if datos!=None:
+
+            alumno={"matricula":datos[0], "nombre":datos[1], "apaterno":datos[2], "amaterno":datos[3], "correo":datos[4]}
+           
+            return alumno
+        else:
+            return None
+    except Exception as ex:
+        return jsonify({"message": "error {}".format(ex),'exito':False}),500
 """ ----------------------------------------------------------------------------------------------------------------------------------- """
+    
+@app.route("/alumnos",methods=['POST'])
+def register_alumno():
+        try:
+            alumno=leer_alumno_bd(request.json['matricula'])
+            if alumno !=None:
+                return jsonify({'mensaje':"Alumno ya existe, no se puede duplicar", 'exito':True})
+            else:
+                cursor=con.connection.cursor()
+                sql='insert into alumno(matricula,nombre,apaterno,amaterno,correo) values("{0}","{1}","{2}","{3}","{4}")'.format(request.json['matricula'],request.json['nombre'],request.json['apaterno'],request.json['amaterno'],request.json['correo'])
+                cursor.execute(sql)
+                con.connection.commit()     
+                return jsonify({'mensaje':'Alumno reigstrado', 'exito':True})   
+        except Exception as ex:
+            return jsonify({'mensaje':'Alumno reigstrado', 'exito':False})   
+
+
+
+""" ----------------------------------------------------------------------------------------------------------------------------------- """
+
 
 @app.route("/alumnos/<mat>",methods=['GET'])
 def leer_alumnos(mat):
     try:
-        alumno=leer_alumnos_bd(mat)
+        alumno=leer_alumno_bd(mat)
         if alumno!= None:
             return jsonify({'alumnos':alumno,'mensaje':'Alumno encontrado', 'exito':True})
         else:
